@@ -1,0 +1,96 @@
+
+openapi: 3.0.1
+info:
+  title: Timebank API
+  description: API per la gestione della banca del tempo
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api
+    description: Ambiente di sviluppo
+
+paths:
+  /auth/login:
+    post:
+      summary: Effettua il login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login effettuato con successo
+        '401':
+          description: Credenziali non valide
+
+  /users/me:
+    get:
+      summary: Ottiene le informazioni dell'utente autenticato
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Dati utente
+        '401':
+          description: Non autorizzato
+
+  /activities:
+    get:
+      summary: Lista tutte le attività pubbliche
+      responses:
+        '200':
+          description: Lista attività
+
+    post:
+      summary: Crea una nuova attività
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                duration:
+                  type: integer
+                date:
+                  type: string
+                  format: date-time
+      responses:
+        '201':
+          description: Attività creata
+        '400':
+          description: Dati non validi
+
+  /activities/{id}:
+    get:
+      summary: Ottiene i dettagli di un'attività
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Dettagli attività
+        '404':
+          description: Attività non trovata
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
